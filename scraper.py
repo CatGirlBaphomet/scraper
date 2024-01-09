@@ -1,5 +1,4 @@
 import requests
-import requests
 from bs4 import BeautifulSoup
 import xml.etree.ElementTree as ET
 
@@ -20,23 +19,27 @@ def extract_external_files(url):
 
     # Find all img tags with external sources
     img_tags = soup.find_all('img', src=True)
-    for img_tag in img_tags:
+    for img_tag in img_tags:    
         external_files.append(img_tag['src'])
+
+    # Create XML file
+    root = ET.Element("root")
+    url_element = ET.SubElement(root, "url")
+    url_element.text = url
+
+    for file in external_files:
+        file_element = ET.SubElement(root, "file")
+        file_element.text = file
+
+    tree = ET.ElementTree(root)
+    tree.write(filename)
 
     return external_files
 
-
 url = input("Enter a website to extract the URL's from: ")
-external_files = extract_external_files(url)
 filename = input("Enter the name for the output XML file: ")
 
 if not filename.endswith('.xml'):
     filename += '.xml'
-# Create XML file
-root = ET.Element("external_files")
-for file in external_files:
-    file_element = ET.SubElement(root, "file")
-    file_element.text = file
 
-tree = ET.ElementTree(root)
-tree.write(filename)
+external_files = extract_external_files(url)
